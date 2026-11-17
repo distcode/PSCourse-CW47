@@ -1,0 +1,383 @@
+# Wiederholung
+Get-Command *remove*
+Set-Alias -name sos -value get-help
+sos Get-Command
+Remove-Alias -Name sos
+Get-Command -noun alias
+Get-Service
+Get-Service | Where-Object { $_.Status -like 'Stopped' }
+Get-Service | Where-Object { $_.Status -eq 'Stopped' }
+Get-Service | Where-Object Status -eq 'Stopped'  # Bedingung 
+
+get-alias -Definition Where-Object
+Get-Service | Where-Object { $_.Name -like 'd*' }
+Get-Service -Name d*
+Get-Service | Where-Object { $_.Name -like 'i*' -or $_.Name -like 'p*' }
+
+Get-Service | Where-Object { $_.Name -like '[ip]*' }
+Get-Service | Where-Object { $_.Name -like '[i-p]*' }
+Get-Service -name '[i-p]*' 
+Get-Service -name '[ip]*' 
+Get-Service | Get-Member
+Get-Service | Get-Member | Where-Object { $_.Membertype -eq 'Property' }
+Get-Service | Get-Member -MemberType Property
+Get-Service | Get-Member -MemberType Properties
+Get-Service | Get-Member -MemberType Method
+Get-Service | Get-Member -MemberType Methods
+services.msc
+Get-Process | Select-Object -Property ID,Name
+Get-Process | Get-Member
+Get-Process | Select-Object -Property ID,Name | Get-Member
+Get-Process | Sort-Object -Property WorkingSet -Descending | Select-Object -First 3
+Get-Process | Sort-Object -Property WorkingSet -Descending | Select-Object -First 3 | Get-Member
+Get-ChildItem C:\Windows\ -File | Select-Object -Property Extension
+Get-ChildItem C:\Windows\ -File | Select-Object -Property Extension -Unique
+Get-Process
+Get-Process powershell
+Get-Process powershell | Get-Member -MemberType Properties
+Get-Process powershell | Select-Object -Property ProcessName,Modules
+Get-Process powershell | Select-Object -ExpandProperty Modules
+(Get-Process powershell).Modules
+Get-Volume
+Get-Volume | Select-Object -Property DriveLetter,SizeRemaining
+$htSizeGB = @{ Label='SizeGB'; Expression = {$_.SizeRemaining / 1GB } }
+Get-Volume | Select-Object -Property DriveLetter,SizeRemaining,$htSizeGB
+$eingabe = 12,34
+$eingabe * 2
+$Eingabe
+$eingabe.GetType()
+$eingabe = 12.34
+$eingabe
+$eingabe.GetType()
+$eingabe * 2
+[double]$eingabe = 12.34
+[double]$eingabe = 12,34
+Remove-Variable -Name eingabe
+eingabe
+$eingabe
+$eingabe = 12.34
+$eingabe
+Get-Variable
+Get-Command -noun variable
+Clear-Variable -Name eingabe
+Get-Variable
+f
+$eingabe = $null
+
+# Working with Objects; PS Results are also Objects
+Get-Process | Measure-Object
+Get-Process | Measure-Object | Get-Member
+$result = Get-Process | Measure-Object
+$result
+$result | Get-Member
+$result.Count
+$CountProcesses = $result.Count
+(Get-Process).Length
+$result = Get-Process | Measure-Object -Property WorkingSet -Sum -Maximum -Minimum -Average
+$result
+$result.Minimum
+(Get-Process)[4].WorkingSet
+Get-Process | Select-Object -Property id,ProcessName
+Get-Process | Select-Object -Property id,ProcessName -First 5
+
+# Format-Table
+Get-Process | Select-Object -First 5 | Format-Table -Property ProcessName,Id
+Get-Process | Select-Object -First 5 | Format-Table -Property ProcessName,Id,WorkingSet
+$htWSMB = @{ Label='WS-MB'; Expression={ $_.WorkingSet / 1MB } }
+Get-Process | Select-Object -First 5 | Format-Table -Property ProcessName,Id,WorkingSet,$htWSMB
+$htWSMB += @{ Format='n2' }
+$htWSMB
+Get-Process | Select-Object -First 5 | Format-Table -Property ProcessName,Id,WorkingSet,$htWSMB
+$htWSMB += @{ Align='center' }
+$htWSMB += @{ Width=25 }
+Get-Process | Select-Object -First 5 | Format-Table -Property ProcessName,Id,WorkingSet,$htWSMB
+Get-Process | Select-Object -First 5 | Format-Table -Property ProcessName,Id,WorkingSet,$htWSMB -AutoSize:$false
+Get-Process | Select-Object -First 5 | Format-Table -Property ProcessName,Id,WorkingSet,$htWSMB
+Get-Command -verb format
+Get-Process | Select-Object -First 5 | Format-List -Property ProcessName,Id,WorkingSet
+
+# Format-List
+Get-Process powershell
+Get-Process powershell | Format-List -Property *
+Get-Process powershell | Format-List -Property s*
+Get-Process powershell | Format-List -Property *ion*
+Get-Process powershell | Format-List -Property id,ProcessName,WorkingSet,$htWSMB
+$htWSMB
+$htWSMB.Remove('Align')
+$htWSMB.Remove('Width')
+Get-Process powershell | Format-List -Property id,ProcessName,WorkingSet,$htWSMB
+
+# Format-Wide
+Get-Process | Format-Wide -Property Processname
+Get-Process | Format-Wide -Property Processname -Column 5
+Get-Process | Format-Wide -Property $htWSMB -Column 5
+Get-Process | Select-Object id,ProcessName,workings,StartTime
+Get-Process | Select-Object id,ProcessName,WorkingSet,StartTime
+Get-Process | Select-Object id,ProcessName,WorkingSet,StartTime,PagedMemorySize
+Get-Process | Select-Object id,ProcessName,WorkingSet,StartTime,PagedMemorySize | Format-Table
+Get-Process | Select-Object id,ProcessName,WorkingSet,StartTime,PagedMemorySize -First 5 | Format-Table
+Get-Process | Select-Object id,ProcessName,WorkingSet,StartTime,PagedMemorySize -First 5 | Get-Member
+Get-Process | Select-Object id,ProcessName,WorkingSet,StartTime,PagedMemorySize -First 5 | Format-Table | Get-Member
+Get-Process | Select-Object id,ProcessName,WorkingSet,StartTime,PagedMemorySize -First 5 | Format-Table 
+Get-Process | Select-Object id,ProcessName,WorkingSet,StartTime,PagedMemorySize -First 5 | Format-Table | Sort-Object -Property Id -Descending
+Get-Process | Select-Object id,ProcessName,WorkingSet,StartTime,PagedMemorySize -First 5 | Sort-Object -Property id -Descending | Format-Table 
+
+# Double vs. Single quotation marks
+'Hello World!'
+"Hello World!"
+$temperatur = 6
+$bedeckung = 'stark bewölkt'
+"Heute hat es " + $temperatur + " Grad und der Himmel ist " + $bedeckung + "."
+"Heute hat es $temperatur Grad und der Himmel ist $bedeckung."
+'Heute hat es $temperatur Grad und der Himmel ist $bedeckung.'
+$htWetter = @{ Temp=7; Bed='bewölkt' }
+$htWetter
+$htWetter.Temp
+"Heute hat es $htWetter.Temp Grad und der Himmel ist $htWetter.Bed."
+$htWetter.ToString()
+$temperatur.tostring()
+"Heute hat es $($htWetter.Temp) Grad und der Himmel ist $($htWetter.Bed)."
+'Heute hat es $($htWetter.Temp) Grad und der Himmel ist $($htWetter.Bed).'
+"Heute hat es $($htWetter.Temp) Grad und`nder Himmel ist $($htWetter.Bed)."
+"Heute hat es $($htWetter.Temp) Grad und`nder Himmel ist`t$($htWetter.Bed)."
+"Heute hat es $($htWetter.Temp) Grad und`nder Himmel ist`t$($htWetter.Bed).`a"
+'Heute hat es $($htWetter.Temp) Grad und`nder Himmel ist`t$($htWetter.Bed).`a'
+
+# f-Operator
+"Heute hat es {0} Grad und der Himmel ist {1}."
+"Heute hat es {0} Grad und der Himmel ist {1}." -f 'X','Y'
+"Heute hat es {0} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed
+"Heute hat es {0:n1} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed
+"Heute hat es {0:p1} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed
+"Heute hat es {0:c2} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed
+"Heute hat es {0:d3} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed
+
+Get-Date
+"Heute, {2}, hat es {0:n1} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed, (Get-Date)
+"Heute, {2:dd. MM. yyyy}, hat es {0:n1} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed, (Get-Date)
+"Heute, {2:dddd. MM. yyyy}, hat es {0:n1} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed, (Get-Date)
+"Heute, {2:ddd. MM. yyyy}, hat es {0:n1} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed, (Get-Date)
+"Heute, {2:dd. MM. yyyy gg}, hat es {0:n1} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed, (Get-Date)
+"Heute, {2:dd. MM. yyyy HH:mm zz}, hat es {0:n1} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed, (Get-Date)
+"Heute, {2:dd. MM. yyyy HH:mm zzzz}, hat es {0:n1} Grad und der Himmel ist {1}." -f $htWetter.Temp,$htWetter.Bed, (Get-Date)
+
+# Datum
+Get-Date
+Get-Date -Format 'dd-MM-yy'
+(Get-Date).ToString('dd-MM-yy')
+(12.345678).ToString('n3')
+(Get-Date).ToShortDateString()
+(Get-Date).ToLongDateString()
+(Get-Date).ToShortTimeString()
+(Get-Date).ToLongTimeString()
+cd .\Windows\
+Get-ChildItem -File
+Get-ChildItem -File | Where-Object { $_.LastWriteTime -eg '16.11.2026' }
+Get-ChildItem -File | Where-Object { $_.LastWriteTime -eq '16.11.2026' }
+Get-ChildItem -File
+$myDate = "16.11.2026"
+$myDate.GetType()
+$myDate = Get-Date -Day 16 -Month 11 -Year 2026
+$mydate.GetType()
+$myDate
+$myDate.Date
+Get-ChildItem -File | Where-Object { $_.LastWriteTime.Date -eq $myDate.Date }
+$XMas = Get-Date -Day 24 -Month 12 -Year 2026
+$XMas - (Get-Date)
+cd \
+(Get-Date).AddDays(180)
+(Get-Date).AddDays(-90)
+
+# File Operations - Part 1
+# Copy;Move;Delete
+Get-Command -noun object # generic cmdlets
+Get-Command -noun item # generic cmdlets
+Get-item
+get-childitem
+Get-ChildItem C:\Windows\ -File
+New-Item -Name CopyDemo -Path . -Type Directory
+ls
+Get-ChildItem C:\Windows\ -File | Copy-Item -Destination C:\CopyDemo\
+cd .\CopyDemo\
+ls
+Rename-Item -Path .\win.ini -NewName c:\winrenamed.ini
+Rename-Item -Path .\win.ini -NewName winrenamed.ini
+ls
+# Remove-Item -Path *.log
+gci
+Remove-Item -Path *.log
+ls
+Robocopy.exe -?
+cd \
+
+# File Operations - Part 2
+
+# unstructured text
+Get-Command -noun content
+ls
+md Temp
+cd .\Temp\
+Set-Content -Value 'Das ist die erste Zeile.' -Path .\File1.txt
+notepad.exe .\File1.txt
+Get-Content .\File1.txt
+Set-Content -Value 'Das ist die zweite Zeile.' -Path .\File1.txt
+Get-Content .\File1.txt
+Set-Content -Value 'Das ist die erste Zeile.' -Path .\File1.txt
+Get-Content .\File1.txt
+Add-Content -Value 'Das ist die zweite Zeile.' -Path .\File1.txt
+Get-Content .\File1.txt
+cd .\Temp\
+Get-Content .\File1.txt
+Get-Content .\File1.txt -TotalCount 1
+Get-Content .\File1.txt -Tail 1
+Get-Content .\File1.txt -Wait
+Add-Content -Value 'Das ist die dritte Zeile.' -Path .\File1.txt
+
+# Redirection
+Get-Process -Name w*
+Get-Process -Name w* > File2.txt
+Get-Content .\File2.txt
+
+Get-ChildItem hklm:\
+Get-ChildItem hklm:\ > File3.txt
+Get-Content .\File3.txt
+Get-ChildItem hklm:\ > File3.txt 2> Error.txt
+ls
+Get-Content .\Error.txt
+Get-ChildItem hklm:\ 2>&1 > File4.txt
+Get-Content .\File4.txt
+Get-Help about_Redirection -ShowWindow
+
+# Out-File
+Get-Process | Select-Object -First 5
+Get-Process | Select-Object -First 5 | Out-File -FilePath File5.txt
+Get-Content .\File5.txt
+Get-ChildItem hklm:\ 
+Get-ChildItem hklm:\ | Out-File File6.txt
+Get-Content .\File6.txt
+Get-ChildItem hklm:\ 2>&1 | Out-File File6.txt
+Get-Content .\File6.txt
+
+# CSV Files
+Get-Process | Select-Object -First 5 -Property Id,ProcessName,WorkingSet,StartTime | Export-Csv -Path .\File7.txt
+.\File7.txt
+Get-Process | Select-Object -First 5 -Property Id,ProcessName,WorkingSet,StartTime | Export-Csv -Path .\File7.txt
+$myProcesses = Import-Csv -Path .\File7.txt
+$myProcesses
+$myProcesses.GetType()
+$myProcesses[2]
+$myProcesses[2].ProcessName
+$myProcesses | Get-Member
+
+# XML Files
+Get-Process | Select-Object -First 5 -Property Id,ProcessName,WorkingSet,StartTime | Export-Clixml -Path File8.xml
+.\File8.xml
+$myProcesses = Import-Clixml -Path .\File8.xml
+$myProcesses
+$myProcesses | Get-Member
+
+# JSON Files
+Get-Process | Select-Object -First 5 -Property Id,ProcessName,WorkingSet,StartTime | ConvertTo-Json
+Get-Process | Select-Object -First 5 -Property Id,ProcessName,WorkingSet,StartTime | ConvertTo-Json | Out-File -FilePath File9.txt
+Get-Content .\File9.txt
+Remove-Variable myProcesses
+get-content .\File9.txt
+get-content .\File9.txt | ConvertFrom-Json
+get-content .\File9.txt | ConvertFrom-Json | Get-Member
+$myProcesses = get-content .\File9.txt | ConvertFrom-Json 
+$myProcesses | Get-Member
+
+# Foreach-Object
+Get-Command -noun object
+Get-Service hidserv | Restart-Service
+get-help Restart-Service -ShowWindow
+'hidserv' | Restart-Service
+Get-Process dwm | Restart-Service
+get-help Restart-Service -Online
+cd C:\CopyDemo\
+ls
+Remove-Item *.*
+Remove-Item *.* -Force
+ls
+Get-ChildItem C:\Windows\ -File | Copy-Item -Destination C:\CopyDemo\
+ls
+Remove-Item *.* -Force
+Get-ChildItem C:\Windows\ -File | ForEach-Object -Process { $_.Name; Copy-Item -Path $_.FullName -Destination C:\CopyDemo\ }
+Remove-Item *.* -Force
+Get-ChildItem C:\Windows\ -File | ForEach-Object -Begin { 'Hello!'; $i = 0 } -Process { $_.Name; Copy-Item -Path $_.FullName -Destination C:\CopyDemo\; $i++ } -End { "Es wurden $i Dateien kopiert.`nBye ..." }
+Get-ChildItem -File | Get-Member
+Get-ChildItem -File | ForEach-Object -Process { $_.Encrypt() }
+Get-ChildItem | Get-Member
+$myArr = @()
+$myArr += 'Yellow'
+$myArr += 'DarkYellow'
+$myArr += 'Magenta'
+$myArr += 'DarkRed'
+$myArr | ForEach-Object -Process { $_ }
+$myArr | ForEach-Object -Process { "Farbe: $_" }
+$myArr | ForEach-Object -Process { write-host "RAINBOW" -ForegroundColor $_ }
+
+# Provider
+Get-PSProvider
+$myVarA = '7654'
+$myVarA.GetType()
+$myVarA
+get-item c:\windows
+get-item variable:\myVarA
+$myVarA
+Get-PSProvider
+Set-Location cert:\
+Get-ChildItem
+cd .\\LocalMachine\
+Get-ChildItem
+certlm.msc
+Get-ChildItem .\BE8DD76F60C521A499DE402ED2B5CD5CE13BD136 | Format-List *
+cd \
+Get-Command -Module pki
+Get-PSProvider
+Set-LocalGroup env:\
+Set-Location env:\
+ls
+get-item env:\username
+(get-item env:\username).value
+$env:username
+get-command *enviro*
+Get-PSProvider
+set-location c:
+Set-Location env:
+c:
+env:
+get-alias -Definition set-location
+Set-Location variable:
+set-location C:\Windows\
+cd ..
+Get-PSDrive
+New-PSDrive -Name x -PSProvider FileSystem -Root \\dc1\sysvol 
+x:
+ls
+c:
+Remove-PSDrive -Name x
+x:
+
+# Registry
+regedit.exe
+Get-ChildItem hkcu:\
+get-item HKCU:\Environment\
+Get-Command -noun itemproperty
+New-ItemProperty -Path HKCU:\Software\Az040\ -Name TlnAnzahl -Value 7 -PropertyType 'Banane'
+New-ItemProperty -Path HKCU:\Software\Az040\ -Name TlnAnzahl -Value 7 -PropertyType 'DWord'
+New-ItemProperty -Path HKCU:\Software\Az040\ -Name DeliveryType -Value 'Remote' -PropertyType 'String'
+Set-ItemProperty -Path HKCU:\Software\Az040\ -Name TlnAnzahl -Value 8
+0x14
+Set-ItemProperty -Path HKCU:\Software\Az040\ -Name TlnAnzahl -Value 0x14
+# Read Reg Values
+Get-ItemProperty -Path HKCU:\Software\Az040\ -Name TlnAnzahl
+(Get-ItemProperty -Path HKCU:\Software\Az040\ -Name TlnAnzahl).TlnAnzahl
+(Get-ItemProperty -Path HKCU:\Software\Az040\ )
+(Get-ItemProperty -Path HKCU:\Software\Az040\ ).TlnAnzahl
+Get-Item -Path HKCU:\Software\Az040\
+(Get-Item -Path HKCU:\Software\Az040\).GetValue('DeliveryType')
+(Get-Item -Path HKCU:\Software\Az040\).GetValueKind('TlnAnzahl')
+Get-ItemPropertyValue -Path HKCU:\Software\Az040\ -Name DeliveryType
+Remove-ItemProperty -Path HKCU:\Software\Az040\ -Name DeliveryType
+Remove-Item -Path HKCU:\Software\Az040\
