@@ -1,0 +1,278 @@
+
+# PowerShell Version
+$PSVersionTable
+
+# Install PowerShell 7
+winget.exe 
+winget search powershell
+winget show --id Microsoft.PowerShell
+winget install --id Microsoft.PowerShell
+
+# cmdline tools work in PS
+ipconfig
+ping 1.1.1.
+ping 1.1.1.1
+dir
+
+# History is saved
+Get-PSReadLineOption
+notepad C:\Users\admin\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
+
+# cmdlets
+# verb-noun
+
+# Alias
+Get-Alias -Name dir
+Get-Alias
+New-Alias -name inhalt -value Get-ChildItem
+inhalt
+Get-Alias
+Get-Alias -Name gci
+get-alias -Definition Get-ChildItem
+ls
+
+# cmdlet: Get-Childitem; Stop-Process; Restart-Service
+Get-Command
+Get-Command -name New-AdUser
+Get-Command -verb test
+Get-Command -Noun Path
+Get-Command -Module PKI
+Get-Command -CommandType Alias
+Get-Command -CommandType Application
+winver.exe
+Get-Command -verb write
+
+# Installing/Using Help
+Get-Help Write-Host
+Get-Help Write-Host -Online
+Update-Help -Force
+md PSHelp
+Save-Help -DestinationPath .\PSHelp\ -Force
+# Update-Help -Force -SourcePath .\PSHelp\
+cd .\PSHelp\
+ls
+Get-Help Write-Host
+Get-Help Write-Host -Examples
+Get-Help Write-Host -Parameter ForegroundColor
+Get-Help Write-Host -Detailed
+Get-Help Write-Host -ShowWindow
+get-help Write-Output -ShowWindow
+cd \
+# abouts
+Get-Help about_*
+Get-Help about_Wildcards
+Get-Help about_Wildcards -ShowWindow
+
+# Variables
+$varA = 'anyText'
+$varA
+Write-Host $varA 
+Write-Host $varA -ForegroundColor Cyan -BackgroundColor DarkGray
+$varA
+$varB = 100
+$varB + 5
+$varB - 5
+$varB * 5
+$varB / 5
+$varB / 0
+$varB % 6
+$varA
+$varB
+$varA + $varB
+$varB + $varA
+$varA = 200
+$varA
+$varB + $varA
+$varA = 'anyText'
+$varB + $varA
+
+# Variable data types
+# bool - char - int - long - single - double
+# string - complex types
+[int]$varA = 100
+$varA = 'anyText'
+$true
+$false
+[int]$true
+[int]$false
+
+notepad.exe
+Get-Process
+Get-Process -Name Notepad
+Get-Process -Name Notepad Get-Member
+Get-Process -Name Notepad | Get-Member
+$myProcess = Get-Process -Name Notepad
+$myProcess
+$myProcess | Get-Member
+
+# Objects in PS
+$myProcess.PID
+$myProcess.ProcessName
+$myProcess.StartTime
+$myProcess = Get-Process -Name Notepad
+$myProcess.StartTime
+$myProcess | Get-Member -MemberType Methods
+$myProcess.Kill
+$myProcess.Kill()
+$myProcess
+Get-Variable
+$varA = 900
+Get-Variable
+Remove-Variable -Name $varA
+Remove-Variable -Name varA
+Get-Variable
+$varA = 800
+Get-Command -noun variable
+# Clear-Variable -Name varA
+Get-Variable
+Clear-Variable -Name varA
+Get-Variable
+Get-Command -noun variable
+New-Variable -Name varB -Value 'anyText' -Option Constant
+$varB
+$varB = 'Hello World!'
+notepad.exe
+$myProcess = Get-Process -Name Notepad
+$myProcess.Id
+(Get-Process -Name Notepad).Id
+(Get-Process -Name Notepad).StartTime
+
+# Array
+$myArrA = 'Audi','VW','Opel'
+$myArrA
+$myArrA[2]
+$myArrA[0]
+$myArrA.length
+$myArrA = $myArrA + 'Fiat'
+$myArrA
+$myArrA.Length
+Clear-Variable -Name myArrA
+$myArrA
+$myArrA = 'Audi','VW','Opel'
+$myArrA.Contains('VW')
+$myArrA.Contains('audi')
+$myArrA.Contains('Audi')
+$myArrA -contains 'audi'
+'audi' -in $myArrA
+$myArrA | Get-Member
+[long[]]$myArrB = 1,2,3,5,7,9
+$myArrB
+$myArrB = $myArrB + 11
+$myArrB = $myArrB + 12.5
+$myArrB
+$myArrB = $myArrB + 'anyText'
+[system.diagnostics.process]$myProcesses = Get-Process Notepad
+$myProcess
+$myProcesses
+$myProcesses.GetType()
+[System.Diagnostics.Processs[]]$myProcesses = Get-Process Notepad
+[System.Diagnostics.Process[]]$myProcesses = Get-Process Notepad
+$myProcesses.GetType()
+$myProcesses.Length
+$myProcesses = $myProcesses + (Get-Process -name powershell)
+$myProcesses
+$myProcesses = Get-Process
+$myProcesses
+$myProcesses.processname
+$myProcesses.processname -contains 'notepad'
+$myProcesses.processname -contains 'paint'
+$myArrC = 'MS','HP','Dell','Lenovo'
+$myArrC
+$myArrC += 'IBM'
+$myArrC
+$myArrD = 1,2,3,5,9
+$varA = 200
+$varA += 2
+$varA
+$varA -= 4
+$varA
+$myArrC -= 'IBM'
+
+# Hashtable
+$myArrC
+$myArrC[1]
+$myAuto = @{ Marke='Ferrari'; Farbe='Rot'; kwh=200 }
+$myAuto
+$myAuto.Marke
+$myAuto.kwh
+$myAuto.GetType()
+$myAuto.Baujahr = 1986
+$myAuto
+$myAuto.Remove('Baujahr')
+$myAuto
+
+# Pipeline - *-object
+Get-Process
+(Get-Process).length
+Get-Process | Measure-Object 
+Get-Process | Measure-Object -Property WorkingSet -Sum
+Get-Process
+
+# Sorting
+Get-Process | Sort-Object -Property WorkingSet
+Get-Process | Sort-Object -Property WorkingSet -Descending
+Get-Process 
+Get-Process | Sort-Object -Property ProcessName,WorkingSet
+Get-Process | Sort-Object -Property ProcessName | Sort-Object -Property WorkingSet -Descending
+Get-Help Sort-Object -ShowWindow
+Get-Help Sort-Object -online
+$htSortNameAsc =  @{Expression = "Processname"; Descending = $false}
+$htSortWSDesc =  @{Expression = "WorkingSet"; Descending = $true}
+$htSortNameAsc
+$htSortWSDesc
+Get-Process | Sort-Object -Property $htSortNameAsc,$htSortWSDesc
+Get-Process Notepad | Get-Member
+Get-Process | Sort-Object -Property StartTime
+
+# Filtering
+Get-Process 
+Get-Process | Where-Object -FilterScript { ProcessName <> 'svchost' } 
+Get-Process | Where-Object -FilterScript { $PSItem.ProcessName -ne 'svchost' } 
+Get-Process | Where-Object -FilterScript { $PSItem.ProcessName -ne 'svchost' } | Measure-Object
+Get-Process
+# Get-Process | Where-Object -FilterScript { $PSItem.WorkingSet -gt 100MB }
+
+# Units in PS
+1KB
+1MB
+1GB
+1Tb
+1Pb
+1EB
+
+Get-Process | Where-Object -FilterScript { $PSItem.WorkingSet -gt 100MB }
+Get-Process
+Get-Process | Where-Object -FilterScript { $PSItem.ProcessName -eq 'w*' }
+Get-Process | Where-Object -FilterScript { $PSItem.ProcessName -like 'w*' }
+Get-Process | Where-Object -FilterScript { $PSItem.ProcessName -like '?i*' }
+Get-Process | Where-Object -FilterScript { $PSItem.WorkingSet -gt 100MB }
+Get-Process | Where-Object -FilterScript { $PSItem.WorkingSet -gt 100MB } | Where-Object -FilterScript { $PSItem.ProcessName -like 'm*' }
+Get-Process | Where-Object -FilterScript { $PSItem.WorkingSet -gt 100MB -and $PSItem.ProcessName -like 'm*' }
+Get-Process | Where-Object -FilterScript { $PSItem.WorkingSet -gt 100MB -or $PSItem.ProcessName -like 'm*' }
+Get-Process | Where-Object -FilterScript { $_.WorkingSet -gt 100MB }
+Get-Process | Where-Object { $_.WorkingSet -gt 100MB }
+Get-Process | ? { $_.WorkingSet -gt 100MB }
+Get-Process | ? WorkingSet -gt 100MB
+Get-Process | ? WorkingSet -gt 100MB -and Processname -like 'm*'
+
+# Selecting
+Get-Process | Select-Object -First 5
+Get-Process | Select-Object -First 3
+Get-Process | Select-Object -Last 3
+Get-Process | Sort-Object -Property WorkingSet -Descending | Select-Object -First 3
+Get-Process | Sort-Object -Property WorkingSet -Descending | Select-Object -Last 5 
+Get-ChildItem C:\Windows\
+Get-ChildItem C:\Windows\ -File
+Get-ChildItem C:\Windows\ -File | Select-Object -Property name,Length,IsReadOnly
+Get-ChildItem C:\Windows\ -File | Get-Member
+Get-ChildItem C:\Windows\ -File | Select-Object -Property Extension
+Get-ChildItem C:\Windows\ -File | Select-Object -Property Extension -Unique
+Get-ChildItem C:\Windows\ -File | Select-Object -Property Extension,Mode
+Get-ChildItem C:\Windows\ -File | Select-Object -Property Extension,LastWriteTime
+Get-ChildItem C:\Windows\ -File | Select-Object -Property Extension,LastWriteTime -Unique
+Get-ChildItem C:\Windows\ -File | Select-Object -Property Name,Length
+$htLengtKB = @{ Label='Size(KB)'; Expression={ $_.Length / 1KB } }
+$htLengtKB
+Get-ChildItem C:\Windows\ -File | Select-Object -Property Name,Length,$htLengtKB
+Get-ChildItem C:\Windows\ -File | Select-Object -Property Name,Length,$htLengtKB | Get-Member
+Get-ChildItem C:\Windows\ -File | Get-Member
