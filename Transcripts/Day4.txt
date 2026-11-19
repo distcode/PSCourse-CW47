@@ -1,0 +1,229 @@
+# Wiederholung 
+Get-ADUser -Filter * -SearchBase 'ou=sales,dc=dist,dc=loc' | ft
+Get-ADUser -Filter * -SearchBase 'ou=sales,dc=dist,dc=loc' -SearchScope OneLevel | ft
+Get-ADUser -Filter * -SearchBase 'ou=sales,dc=dist,dc=loc' -SearchScope OneLevel | ft -Property SAMAccountName,Name,Distinguishedname,JobTitle,Department,SID
+Get-ADUser -Filter * -SearchBase 'ou=sales,dc=dist,dc=loc' -SearchScope OneLevel -Properties Department,JobTitle | ft -Property SAMAccountName,Name,Distinguishedname,JobTitle,Department,SID
+Get-ADUser -Filter * -SearchBase 'ou=sales,dc=dist,dc=loc' -SearchScope OneLevel -Properties Department,Title | ft -Property SAMAccountName,Name,Distinguishedname,JobTitle,Department,SID
+Get-ADUser -Filter * -SearchBase 'ou=sales,dc=dist,dc=loc' -SearchScope OneLevel -Properties Department,Title | ft -Property SAMAccountName,Name,Distinguishedname,Title,Department,SID
+Get-ADUser -Filter * -SearchBase 'ou=sales,dc=dist,dc=loc' -SearchScope OneLevel -Properties Department,Title | Select-Object -Property SAMAccountName,Name,Distinguishedname,Title,Department,SID
+Get-ADUser -Filter * -SearchBase 'ou=sales,dc=dist,dc=loc' -SearchScope OneLevel -Properties Department,Title | Select-Object -Property SAMAccountName,Name,Distinguishedname,Title,Department,SID | Export-Clixml C:\Temp\ADUsers.xml
+cd .\Temp\
+.\ADUsers.xml
+Get-ADUser -Identity james
+New-ADGroup -Name Promotor -GroupScope Universal -GroupCategory Security -Path 'ou=Sales,dc=dist,dc=loc'
+Get-ADGroup -Identity Promotor
+Add-ADUser -Name CHarles,JAne,Sigid,Victor -path 'cn=Promotor,ou=Sales,dc=dist,dc=loc'
+Add-ADGroupMember -Identity Promotor -Members Charles,Jane,Sigrid,Victor
+Get-ADGroupMember -Identity Promotor
+Get-Command -Module ActiveDirectory -verb add
+Get-Module -ListAvailable -Name a*
+cd \
+
+# Feature in Windows 11
+Get-WindowsOptionalFeature -Online | Select-Object -F 3
+Get-WindowsCapability -Online | Select-Object -f 3
+Get-AppxPackage | Select-Object -First 3
+Get-AppxPackage | ft name
+
+# Strict Mode
+Get-Variable -Name b
+$b * 2
+$myFile = Get-ChildItem C:\Windows\win.ini
+$myFile.FullName
+$myFile.Lenght
+$myArr = @('A','Z','Q')
+$myArr[2]
+$myArr[3]
+Set-StrictMode -Version 1 
+$b * 2
+$myFile.Lenght
+$myArr[3]
+Set-StrictMode -Version 2
+$b * 2
+$myFile.Lenght
+$myArr[3]
+Set-StrictMode -Version latest
+$b * 2
+$myFile.Lenght
+$myArr[3]
+
+get-variable -Name z
+$ErrorActionPreference
+Get-Variable
+$?
+4 / 0
+$?
+Get-Variable -Name z
+$?
+
+# Eventlog
+Get-Command -noun eventlog
+Show-EventLog
+Get-EventLog -List
+Get-EventLog -LogName System
+Get-EventLog -LogName System -EntryType Error
+Get-EventLog -LogName System -EntryType Error -Newest 5
+Get-EventLog -LogName System -Message '*disk*'
+get-eventlog -LogName System -InstanceId 10010
+New-EventLog -LogName Az040 -Source 'Backup','ConfigMgmt','Deployment'
+get-eventlog -List
+Show-EventLog
+Limit-EventLog -LogName Az040 -MaximumSize 15MB -OverflowAction OverwriteAsNeeded
+Get-EventLog -List
+Write-EventLog -LogName Az040 -Source 'ConfigMgmt' -EntryType Information -EventId 4711 -Message 'Hello World!'
+Get-EventLog -LogName Az040
+
+# WMI
+Get-Command -Module CimCmdlets
+Get-CimClass -Namespace root/CIMV2
+Get-CimClass -Namespace root/CIMV2 -ClassName *process*
+Get-CimClass -Namespace root/CIMV2 -ClassName Win32_Process
+(Get-CimClass -Namespace root/CIMV2 -ClassName Win32_Process).CimClassProperties
+(Get-CimClass -Namespace root/CIMV2 -ClassName Win32_Process).CimClassProperties | Format-Table
+(Get-CimClass -Namespace root/CIMV2 -ClassName Win32_Process).CimClassMethods | Format-Table
+Get-CimInstance -Namespace root/CIMV2 -ClassName Win32_Process
+Get-CimInstance -Namespace root/CIMV2 -ClassName Win32_Process | Where-Object { $_.Name -eq 'powershell_ise.exe' }
+Get-CimInstance -Namespace root/CIMV2 -ClassName Win32_Process | Where-Object { $_.Name -eq 'powershell_ise.exe' } | Format-List -Property *
+Get-CimInstance -Namespace root/CIMV2 -ClassName Win32_Process | Where-Object { $_.Name -eq 'powershell_ise.exe' } 
+Get-CimInstance -Query " Select * From Win32_Process Where Name='powershell_ise.exe' "
+get-help about_wql
+$myProcess = Get-CimInstance -Query " Select * From Win32_Process Where Name='powershell_ise.exe' "
+$myProcess
+$myProcess | Invoke-CimMethod -MethodName GetOwner 
+$myProcess | Invoke-CimMethod -MethodName Terminate -Arguments @{ Reason=5 }
+Get-ComputerInfo
+
+# Remoting
+Enable-PSRemoting
+Get-PSSessionConfiguration
+Get-PSSessionConfiguration -Name microsoft.powershell
+Get-PSSessionConfiguration -Name microsoft.powershell | fl *
+Set-PSSessionConfiguration -Name microsoft.powershell -ShowSecurityDescriptorUI
+Disable-PSRemoting
+Set-PSSessionConfiguration -Name microsoft.powershell -ShowSecurityDescriptorUI
+Enable-PSRemoting
+Get-Process -Name m*
+Get-Process -Name m* -ComputerName dc1
+Get-Process -Name m* -ComputerName dc1,srv1
+Get-Process -Name m* -ComputerName srv1
+Invoke-Command -ComputerName dc1 -Command { Get-Process -Name m* }
+Invoke-Command -ComputerName dc1,srv1 -Command { Get-Process -Name m* }
+cd .\Az040\
+cd .\PSScripts\
+.\Script01.ps1
+Invoke-Command -ComputerName dc1 -FilePath .\Script01.ps1
+Invoke-Command -ComputerName dc1,srv1,srv2 -FilePath .\Script01.ps1
+cd \
+Invoke-Command -ComputerName dc1 -Command { Get-Process -Name m* }
+Invoke-Command -ComputerName dc1 -Command { Get-Process -Name MsMpEng }
+Get-Process -Name MsMpEng
+Get-Process -Name MsMpEng | Get-Member
+Invoke-Command -ComputerName dc1 -Command { Get-Process -Name MsMpEng } | Get-Member
+Invoke-Command -ComputerName dc1 -Command { Write-Hello }
+Enter-PSSession -ComputerName dc1
+Exit-PSSession
+Enter-PSSession -ComputerName dc1
+exit
+
+# Permanent Session
+$DC1Sess = New-PSSession -ComputerName dc1
+$DC1Sess
+Enter-PSSession -Session $DC1Sess
+cd \
+$a = 9.8765
+$a
+exit
+Enter-PSSession -Session $DC1Sess
+$a
+exit
+Invoke-Command -Session $DC1Sess -Command { $b = 'Hurra!' }
+Invoke-Command -Session $DC1Sess -Command { $b }
+Remove-PSSession -Session $DC1Sess
+$DC1Sess
+Remove-Variable DC1Sess
+$myServersSession = New-PSSession -ComputerName dc1,srv1,srv2
+$myServersSession
+Invoke-Command -Session $myServersSession -Command { Get-Process wsm* }
+Enter-PSSession -Session $myServersSession
+# Enable-PSRemoting
+# Set-PSSessionConfiguration -Name microsoft.powerpoint -ShowSecurityDescriptorUI
+# Invoke-command; Enter-PSSession
+
+# Implicit Remoting with a single module
+Get-Module -ListAvailable -Name A*
+$DC1Sess = New-PSSession -ComputerName dc1
+$DC1Sess
+Import-Module -Name ActiveDirectory 
+Import-Module -Name ActiveDirectory -PSSession $DC1Sess
+Set-ExecutionPolicy -ExecutionPolicy Bypass
+Import-Module -Name ActiveDirectory -PSSession $DC1Sess
+Get-Module
+Get-ADUser -Filter * | ft
+Get-ADUser -Filter * | Get-Member
+Get-Command -Name Get-ADUser
+(Get-Command -Name Get-ADUser).Definition
+Remove-Module -name ActiveDirectory
+Get-Module
+
+# Implicit Remoting with all modules
+$DC1Sess
+Import-PSSession -Session $DC1Sess
+
+
+# Jobs
+$Result = Get-ChildItem -Path 'C:\windows\' -File -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.Length -gt 1MB }
+# Job Types: Background - RemoteJob - ScheduledJob
+Get-Command -noun job
+Start-Job -Name 'LargeFiles' -ScriptBlock { gci C:\Windows\ -File -Recurse -ErrorAction SilentlyContinue | ? length -gt 1MB }
+Get-Job
+Get-Service p*
+Get-Job
+exit
+Get-Job
+Start-Job -Name 'LargeFiles' -ScriptBlock { gci C:\Windows\ -File -Recurse -ErrorAction SilentlyContinue | ? length -gt 1MB }
+Get-Job
+Receive-Job -Job 1 -Keep
+Receive-Job -Id 1 -Keep
+Get-Job
+Receive-Job -Id 1 -Keep | Get-Member
+Start-Job -Name JobParameter -ScriptBlock { Get-Service -Name $ServiceName }
+$ServiceName = 'p*'
+Start-Job -Name JobParameter -ScriptBlock { Get-Service -Name $ServiceName }
+Get-Job
+Receive-Job -Id 5 -Keep
+$ServiceName = 'p*'
+Start-Job -Name JobParameter -ScriptBlock { Get-Service -Name $using:ServiceName }
+Get-Job
+Receive-Job -Id 7 -Keep
+Get-Job
+Receive-Job -Id 7 
+Get-Job
+Receive-Job -Id 7 
+Get-Job
+Start-Job -Name 'LargeFilesStoppend' -ScriptBlock { gci C:\Windows\ -File -Recurse -ErrorAction SilentlyContinue | ? length -gt 1MB }
+Get-Job
+Stop-Job -Id 9
+Get-Job
+Get-Job | Remove-Job
+Get-Job
+Get-Command -noun Job
+
+# Remote Jobs
+Invoke-Command -ComputerName dc1 -ScriptBlock { gci C:\Windows\system32 -File -Recurse -ErrorAction SilentlyContinue | ? length -gt 1MB } -AsJob
+Get-Job
+Get-Command -ParameterName AsJob
+Get-Command -Name *scheduledjob*
+Get-Command -Name *scheduledtask*
+compmgmt.msc
+Get-ScheduledTask
+
+# Scheduled Jobs
+Get-Command -Name *scheduledjob*
+ls C:\CopyDemo
+$JobTrigger = New-JobTrigger -At (Get-Date).AddMinutes(7)
+$JobTrigger = New-JobTrigger -At (Get-Date).AddMinutes(7) -Once 
+$JobOptions = New-ScheduledJobOption -RequireNetwork 
+Register-ScheduledJob -ScriptBlock { gci C:\Windows\ -File | Copy-Item -Destination C:\CopyDemo\ } -Name 'WinFileCopy' -Trigger $JobTrigger -ScheduledJobOption $JobOptions 
+ls C:\CopyDemo
+# after job ran first:
+Get-Job

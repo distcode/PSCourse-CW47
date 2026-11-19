@@ -1,0 +1,242 @@
+# Wiederholung
+
+Get-NetAdapter | Format-Table -Property Name,Status,Hidden,FullDuplex,MacAddress,InterfaceIndex
+Get-ChildItem C:\Windows\ -File | Format-Table -Property Name,Length,Mode -GroupBy Extension
+Get-ChildItem C:\Windows\ -File | Sort-Object -Property Extension | Format-Table -Property Name,Length,Mode -GroupBy Extension
+Get-ChildItem C:\Windows\ -File | Sort-Object -Property Extension | Format-Table -Property Name,Length,Mode
+Get-ChildItem C:\Windows\ -File | Sort-Object -Property Extension | Format-Table -Property Name,Length,Mode -GroupBy extension
+Get-ChildItem C:\Windows\System32\ -file | format-table extension
+Get-ChildItem C:\Windows\System32\ -file | Select-Object -Property Extension -Unique
+Get-ChildItem C:\Windows\System32\ -file | Select-Object -Property Extension -Unique | Format-Wide -Property Extension -Column 5
+Get-ChildItem C:\Windows\System32\ -file | Select-Object -Property Extension -Unique | Format-table -Property Extension
+Get-ChildItem C:\Windows\System32\ -file | Select-Object -Property Extension -Unique | Format-table -Property Extension -Column 5
+Get-ChildItem C:\Windows\System32\ -file | Select-Object -Property Extension -Unique | Format-table -Property Extension -HideTableHeaders
+Get-ChildItem C:\Windows\System32\ -file | Format-table -Property Extension -RepeatHeader 
+Get-ChildItem C:\Windows\System32\ -file | Format-table -Property Extension -RepeatHeader | more
+Get-ChildItem C:\Windows\System32\ -file | Out-GridView
+notepad;control.exe
+Get-Process | Out-GridView
+Get-Process | Out-GridView -PassThru
+Get-Process | Out-GridView -PassThru | Stop-Process
+Get-Process | Out-GridView -OutputMode Single 
+Get-SmbShare
+Get-SmbShare -Name Admin$
+Get-SmbShare -Name Admin$ | Get-Member
+Get-SmbShare -Name Admin$ | Format-List -Property *
+Get-SmbShare -Name Admin$ | Format-List -Property c*
+Get-SmbShare -Name Admin$ | Format-List -Property *it
+Get-ChildItem 'C:\Program Files\' -file | Where-Object { $_.Length -gt 10MB }
+Get-ChildItem 'C:\Program Files\' -File -Recurse | Where-Object { $_.Length -gt 10MB }
+Get-ChildItem 'C:\Program Files\' -File -Recurse | Where-Object { $_.Length -gt 10MB } | Format-Table -Property Name,Length
+$ErrorActionPreference = 'SilentlyContinue'
+Get-ChildItem 'C:\Program Files\' -File -Recurse | Where-Object { $_.Length -gt 10MB } | Format-Table -Property Name,Length
+
+# Berechnete, eigene Spalten in Format-* und Select-Object
+$htSizeMB = @{ Label='SizeMB'; Expression= { $_.Length / 1MB } }
+$htSizeMB
+Get-ChildItem 'C:\Program Files\' -File -Recurse | Where-Object { $_.Length -gt 10MB } | Format-Table -Property Name,Length,$htSizeMB
+$htSize.Format = 'n2'
+$htSizeMB
+$htSizeMB.Format = 'n2'
+$htSizeMB
+Get-ChildItem 'C:\Program Files\' -File -Recurse | Where-Object { $_.Length -gt 10MB } | Format-Table -Property Name,Length,$htSizeMB
+
+regedit.exe
+Get-ItemProperty -Path HKCU:\Software\Microsoft\IdentityCRL\ -Name MigrationDone
+(Get-ItemProperty -Path HKCU:\Software\Microsoft\IdentityCRL\ -Name MigrationDone) | Get-Member
+(Get-ItemProperty -Path HKCU:\Software\Microsoft\IdentityCRL\ -Name MigrationDone).MigrationDone
+Get-ItemProperty -Path HKCU:\Software\Microsoft\IdentityCRL\
+Get-ItemPropertyValue -Path HKCU:\Software\Microsoft\IdentityCRL\ -Name MigrationDone
+Get-Process | Where-Object { $_.Name -ne 'Svchost' } | Select-Object -Property Id,Name,HandleCount | Export-Csv -Path C:\Temp\Processes.txt -Delimiter ';'
+cd .\Temp\
+Get-ChildItem
+Get-Alias -Definition Get-Content
+Get-Content .\Processes.txt
+1..3 | ForEach-Object { notepad.exe }
+Get-Process Notepad | Export-Csv -Path C:\Temp\Processes.txt -Delimiter ';' -Append
+Get-Content .\Processes.txt
+Get-Content .\Processes.txt -TotalCount 5
+(Get-Content .\Processes.txt -TotalCount 5)[1]
+Get-Content .\Processes.txt -Tail 3
+cd \
+
+# Cmdlet Parameters
+Get-ChildItem C:\Windows\ -File; Get-ChildItem -Path C:\Windows\ -File
+Get-Help Get-EventLog
+Get-EventLog -LogName System -Newest 3
+Get-EventLog System -Newest 3
+Get-EventLog -Newest 3
+Get-EventLog -LogName System 3
+Get-Help Get-EventLog
+Get-EventLog -LogName System -Newest 3
+Get-Help Get-EventLog
+Get-EventLog -List
+Get-EventLog -List -logName System
+Get-Help Get-EventLog
+get-help Get-Command
+$ErrorActionPreference = 'Continue'
+Get-Command -name get-help -verb set
+Get-Command -name get-help 
+get-help get-command
+get-help get-command -online
+secpol.exe
+gpresult.exe /?
+Get-Module -ListAvailable
+Get-WindowsOptionalFeature -Online 
+Get-WindowsOptionalFeature -Online | Format-Table
+Get-AppxPackage 
+Get-AppxPackage | ft packagefullname,name
+get-command *capab*
+Get-WindowsCapability -Online
+Get-WindowsCapability -Online | ft
+# Add-WindowsCapability -Online -Name 'Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0' 
+Measure-Command -Expression { Add-WindowsCapability -Online -Name 'Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0' }
+get-module -ListAvailable -Name a*
+
+# Active Directory Domain Services
+
+# am DC1 präsentiert:
+
+Get-Module -ListAvailable
+Get-Command -Module ActiveDirectory
+Get-ADRootDSE
+Get-ADForest
+get-addomain
+
+Get-ADUser -Filter *
+Get-ADUser -Filter * | Format-Table
+whoami
+
+Get-ADUser -Filter * 
+Get-ADUser -Filter * | ft
+Get-ADUser -Filter * -SearchBase 'ou=IT,dc=dist,dc=loc'
+Get-ADUser -Filter * -SearchBase 'ou=IT,dc=dist,dc=loc' | ft
+Get-ADUser -Filter * -SearchBase 'ou=marketing,dc=dist,dc=loc' | ft
+Get-ADUser -Filter * -SearchBase 'ou=sales,dc=dist,dc=loc' | ft
+Get-ADUser -Filter * -SearchBase 'ou=sales,dc=dist,dc=loc' -SearchScope OneLevel | ft
+Get-ADUser -Filter * -SearchBase 'ou=sales,dc=dist,dc=loc' -SearchScope OneLevel | Format-Table Name,SamAccountName
+Get-ADOrganizationalUnit -Filter *
+Get-ADGroup -Filter * | ft
+Get-ADComputer -Filter *
+Get-ADComputer -Filter * | ft
+
+Get-ADUser -Identity 'cn=james joyce,ou=online,ou=sales,dc=dist,dc=loc'
+Get-ADUser -Identity 'cn=james joyce,ou=online,ou=sales,dc=dist,dc=loc' | Format-List *
+Get-ADUser -Identity 'cn=james joyce,ou=online,ou=sales,dc=dist,dc=loc' -Properties Description,Department
+Get-ADUser -Identity 'cn=james joyce,ou=online,ou=sales,dc=dist,dc=loc' -Properties *
+Get-ADUser -Identity 'cn=james joyce,ou=online,ou=sales,dc=dist,dc=loc' -Properties d*
+Get-ADUser -Identity 'bd9f2fcc-07a4-4d94-9d1a-89facbe8b726'
+Get-ADUser -Identity samAccountName
+Get-ADUser -Identity james
+
+Get-ADUser -Filter * | ft
+Get-ADUser -Filter * | ft name,givenname,surname
+Get-ADUser -Filter * | Where-Object { $_.Surname -like 't*' } | ft name,givenname,surname
+Get-ADUser -Filter { Surname -like 't*' } | ft name,givenname,surname
+
+Get-ADUser -Filter * | ft
+Get-ADUser -Identity james
+get-ADUser -Identity james -Properties Company
+Set-ADUser -Identity james -Company 'FL'
+get-ADUser -Identity james -Properties Company
+Set-ADUser -Identity james -EmployeeID 'PID-0017' -EmployeeNumber '17' -EmployeeType 'Prokurist'
+
+$htUserAttributes = @{ EmployeeID='PID-0017'; EmployeeNumber=17 }
+$htUserAttributes
+$htUserAttributes.EmployeeType = 'Prokurist'
+$htUserAttributes
+Set-ADUser -Identity james -Replace $htUserAttributes
+
+Get-ADUser -Identity james -Properties EmployeeID,EmployeeNumber,EmployeeType
+Set-ADUser -Identity james -Clear @('EmployeeID','EmplopyeeNumber','EmployeeType')
+Set-ADUser -Identity james -Clear @('EmployeeID','EmployeeNumber','EmployeeType')
+Get-ADUser -Identity james -Properties EmployeeID,EmployeeNumber,EmployeeType
+
+# New User: Dan Brown
+Get-ADUser -Identity dan
+New-ADUser -Path 'ou=IT,dc=dist,dc=loc' -Name 'Dan Brown' -DisplayName 'Dan Brown' -GivenName 'Dan' -Surname 'Brown' -SamAccountName 'Dan' -UserPrincipalName 'dan.brown@dist.loc' 
+Get-ADUser -Identity dan
+Enable-ADAccount -Identity dan
+
+Get-ADUser -Identity dan
+$pwd = ConvertTo-SecureString -String 'Pa55w.rd'
+$pwd
+$cred
+
+$pwd | Export-Clixml -Path C:\Temp\myPWD.xml
+cd .\Temp\
+
+.\myPWD.xml
+$myPWD = Import-Clixml .\myPWD.xml
+cd \
+$myPWD
+
+# Groups in ADDS
+Get-ADGroup -Filter * | ft
+New-ADGroup -Path 'ou=IT,dc=dist,dc=loc' -Name Reviewer -GroupCategory Security -GroupScope Universal -ManagedBy (Get-ADUser -Identity admin)
+get-adgroup -Identity Reviewer
+Get-Command -Module ActiveDirectory -noun groupmember
+Get-Command -Module ActiveDirectory -noun adgroupmember
+Add-ADGroupMember -Identity Reviewer -Members dan
+Get-ADGroupMember -Identity Reviewer
+Get-ADUser -Identity dan
+get-adgroup -Filter * | ft
+Add-ADGroupMember -Identity 'CN=Hyper-V Administrators,CN=Builtin,DC=dist,DC=loc' -Members dan
+Get-ADGroupMember -Identity 'CN=Hyper-V Administrators,CN=Builtin,DC=dist,DC=loc'
+Get-ADUser -Identity dan -Properties MemberOf
+Get-ADPrincipalGroupMembership -Identity dan
+get-command -Module ActiveDirectory 
+Search-ADAccount -AccountDisabled | ft
+Search-ADAccount -AccountDisabled -SearchBase 'ou=it,dc=dist,dc=loc'
+Search-ADAccount -AccountDisabled -SearchBase 'ou=it,dc=dist,dc=loc' | ft
+Search-ADAccount -AccountInactive | ft
+Get-Command -Module ActiveDirectory -noun adcomputer
+Test-ComputerSecureChannel
+
+# Script Execution
+cd .\Az040\
+cd .\PSScripts\
+notepad Script01.ps1
+Write-Host "Guten Tag $env:Username!" -foregroudcolor White -backgroundcolor DarkGreen
+Write-Host "Sie sitzen am Rechner $env:Computername." -foregroundcolor White -backgroundcolor DarkGreen
+Get-Content .\Script01.ps1
+script01.ps1
+C:\az040\PSScripts\Script01.ps1
+Get-ExecutionPolicy
+Get-ExecutionPolicy -List
+Set-ExecutionPolicy -Scope LocalMachine -ExecutionPolicy Bypass 
+Get-ExecutionPolicy -List
+C:\az040\PSScripts\Script01.ps1
+.\Script01.ps1
+
+cd .\Az040\PSScripts\
+get-help about_*
+get-help 'about_Functions_Advanced_Param*' -ShowWindow
+
+get-domainname -upn 'silke@rmi.at'
+get-command -name get-domainname
+.\Script09.ps1
+get-command -name get-domainname
+. C:\Az040\PSScripts\Script09.ps1
+. .\Script09.ps1
+get-command -name get-domainname
+Get-Domainname -UPN 'toni@tirol.at'
+
+# Module !!!
+Get-Module -ListAvailable
+md Az040Tools
+Import-Module -Name .\Az040Tools\Az040Tools.psm1
+get-module 
+get-command -Module Az040Tools
+Write-Hello
+$env:PSModulePath
+$env:PSModulePath -split ';'
+Get-Module
+Get-Module -ListAvailable
+Write-Hello
+Get-Module
+Get-Domainname -UPN 'andi@fwsg.at'
+cd .\Az040Tools\
+New-ModuleManifest -RootModule .\Az040Tools.psm1 -ModuleVersion '1.0' -Author 'Trainer' -Path .\Az040Tools.psd1
+Remove-Module Az040Tools
+Get-Module -ListAvailable -Refresh

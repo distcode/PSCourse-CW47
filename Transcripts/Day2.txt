@@ -381,3 +381,10 @@ Get-Item -Path HKCU:\Software\Az040\
 Get-ItemPropertyValue -Path HKCU:\Software\Az040\ -Name DeliveryType
 Remove-ItemProperty -Path HKCU:\Software\Az040\ -Name DeliveryType
 Remove-Item -Path HKCU:\Software\Az040\
+
+# Wie kann man die Properties und Methoden von Arrays sehen
+$arr = @(1,2,3,5,7,11)
+
+Get-Member -InputObject $arr
+# oder:
+,$arr | Get-Member
