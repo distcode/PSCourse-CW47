@@ -1,0 +1,154 @@
+
+# Wiederholung
+Get-EventLog -LogName Application -Newest 15
+$start = (get-date).date.AddDays(-1)
+$ende = (Get-date).Date
+Get-EventLog -LogName Application -FilterHashtable @{ Logname='Application'; StartTime=$start; EndTime=$ende } # not working
+get-help Get-EventLog -ShowWindow
+Get-WinEvent -FilterHashtable @{ Logname='Application'; StartTime=$start; EndTime=$ende }
+Get-WinEvent -FilterHashtable @{ Logname='Application'; StartTime=$start; EndTime=$ende } | ft
+Get-WinEvent -FilterHashtable @{ Logname='Application'; StartTime=$start; EndTime=$ende } | ft TimeCreated,id,LevelDisplayName,Message
+Get-EventLog -LogName Application -After $start -Before $ende
+$start
+$ende
+get-date
+(get-date).Date
+Get-EventLog -Newest 1 -LogName Application | Get-Member
+Get-EventLog -Newest 3 -LogName Application | Get-Member
+
+Show-EventLog
+Get-EventLog -List
+Get-WinEvent -ListLog *
+Get-WinEvent -ListLog *group*
+Get-WinEvent -LogName 'Microsoft-Windows-GroupPolicy/Operational' -MaxEvents 10
+Get-WinEvent -LogName 'Application' -MaxEvents 10
+New-EventLog -LogName PSTraining -Source 'Shell'
+Get-EventLog -List
+Write-EventLog -LogName PSTraining -Message 'ybc' -EntryType Warning -EventId 3 -Source Shell
+get-eventlog -log PSTraining
+
+Get-CimClass -ClassName *memory*
+Get-CimInstance -ClassName Win32_PhysicalMemory
+Get-CimInstance -ClassName Win32_PhysicalMemory | ft
+Get-CimInstance -ClassName Win32_ComputerSystem
+Get-CimInstance -ClassName Win32_StartupCommand
+(Get-CimInstance -ClassName Win32_StartupCommand).count
+(Get-CimInstance -ClassName Win32_StartupCommand) | measure-obj
+(Get-CimInstance -ClassName Win32_StartupCommand) | Measure-Object
+Get-CimInstance -ClassName Win32_Process | Get-Member
+(Get-CimClass -ClassName Win32_Product).CimClassMethods | ft
+(Get-CimClass -ClassName Win32_Product).CimClassProperties | ft
+winget search adobe
+winget install --id Adobe.Acrobat.Reader.64-bit
+Get-CimInstance -ClassName Win32_Product
+Get-CimInstance -ClassName Win32_Product | Where-Object { $_.Caption -like '*adobe*' }
+(Get-CimClass -ClassName Win32_Product).CimClassMethods | ft
+Get-CimInstance -ClassName Win32_Product | Where-Object { $_.Caption -like '*adobe*' } | Invoke-CimMethod -MethodName Uninstall
+
+Get-SmbShare
+Invoke-Command -ComputerName dc1 -ScriptBlock { Get-SmbShare }
+Invoke-Command -ComputerName dc1 -Command { Get-SmbShare }
+Get-Process | Where-Object { $_.WorkingSet -gt 50MB }
+Get-Process -ComputerName dc1,srv2 | Where-Object { $_.WorkingSet -gt 50MB }
+Invoke-Command -ComputerName dc1,srv2 -ScriptBlock { Get-Process | Where-Object { $_.WorkingSet -gt 50MB } }
+Get-Process -ComputerName dc1,srv2 | Where-Object { $_.WorkingSet -gt 50MB }
+get-alias cls
+Start-Job -name DemoJob -ScriptBlock { 1..5 }
+Get-Job
+Receive-Job -Id 7 -Keep
+Get-Job
+Receive-Job -Id 7 
+Get-Job
+$dc1Session = New-PSSession -ComputerName dc1
+Invoke-Command -Session $dc1Session -ScriptBlock { Get-ChildItem c:\ -File -Recurse | Where-Object { $_.length -gt 50MB } } -AsJob
+Get-Job -Id 9 | fl *
+ipconfig
+
+# Netzwerk Konfiguration
+Get-NetIPConfiguration
+Get-NetIPConfiguration | Get-Member
+ipconfig | Get-Member
+Get-NetIPConfiguration 
+Get-NetIPConfiguration
+Get-NetIPAddress
+Get-NetIPAddress | ft
+Get-NetIPConfiguration -InterfaceIndex 10
+Get-NetIPConfiguration -InterfaceIndex 10 | fl *
+Set-NetIPInterface -InterfaceIndex 10 -Dhcp Enabled
+Get-NetIPConfiguration -InterfaceIndex 10 
+New-NetIPAddress -InterfaceIndex 10 -IPAddress 10.202.0.21 -PrefixLength 24 -DefaultGateway 10.202.0.100 -AddressFamily IPv4
+Get-NetIPConfiguration -InterfaceIndex 10
+
+Get-NetRoute
+Get-NetRoute -DestinationPrefix 0.0.0.0/0
+Get-NetRoute -DestinationPrefix 0.0.0.0/0 -InterfaceIndex 10
+Get-NetRoute -DestinationPrefix 0.0.0.0/0 -InterfaceIndex 10 | Remove-NetRoute
+Get-NetRoute
+Get-NetIPConfiguration -InterfaceIndex 10
+
+Get-DnsClientServerAddress
+Set-DnsClientServerAddress -InterfaceIndex 10 -ServerAddresses '10.202.0.11','8.8.8.8'
+Get-NetIPConfiguration -InterfaceIndex 10
+Set-DnsClientServerAddress -InterfaceIndex 10 -ResetServerAddresses
+Get-NetIPConfiguration -InterfaceIndex 10
+Set-DnsClientServerAddress -InterfaceIndex 10 -ServerAddresses '10.202.0.11'
+Get-NetIPConfiguration -InterfaceIndex 10
+
+Clear-DnsClientCache 
+
+Get-NetFirewallRule
+# Get-NetFirewallRule -Direction Inbound
+Get-NetFirewallRule  -name *icmp*
+Get-NetFirewallRule -name *icmp4* 
+Get-NetFirewallRule -name *icmp4*  | ft
+Get-NetFirewallRule -name 'FPS-ICMP4-ERQ-In'
+Get-NetFirewallRule -name 'FPS-ICMP4-ERQ-In' | Enable-NetFirewallRule
+Get-NetFirewallRule -name 'FPS-ICMP4-ERQ-In'
+# New-NetFirewallRule ; Set-NetFirewallRule 
+Get-NetFirewallRule -name 'FPS-ICMP4-ERQ-In' 
+Get-NetFirewallProfile
+Set-NetFirewallProfile -All -Enabled False 
+Set-NetFirewallProfile -All -Enabled True
+
+# ACL
+$Az040DemoACL = Get-Acl -Path .\Az040Demo\
+$Az040DemoACL
+$Az040DemoACL.Access
+icacls.exe -?
+icacls.exe -h
+icacls.exe
+
+# PowerShellGet
+Get-Module -ListAvailable
+Find-Module
+Find-Module PSWindowsUpdate
+Find-Module PSWindowsUpdate | fl *
+Install-Module PSWindowsUpdate
+Get-Command -Module PSWindowsUpdate
+Get-WUList
+
+# MS Cloud Services
+Find-Module Az
+Install-Module Az -Force
+Install-Module Microsoft.Graph -Force
+Find-Module *ExchangeOnline*
+Install-Module ExchangeOnlineManagement -Force
+Get-Module -ListAvailable -Name az*
+Connect-AzAccount
+Get-AzVM
+Find-Module Az
+Get-Module -ListAvailable -Name Microsoft.Graph*
+Get-Module -ListAvailable -Name Microsoft.Graph*
+Connect-MgGraph -Scopes User.ReadWrite.All,Group.ReadWrite.All
+Get-MgContext
+Get-MgUser
+Get-Command -Module Microsoft.Graph.Groups
+Get-Command -Module *microsoft.graph* -name *request
+Get-Command -Module *microsoft.graph* -name *request*
+Get-Command -Module ExchangeOnlineManagement 
+Get-Module
+Connect-ExchangeOnline
+Get-Module 
+Get-Command -mod tmpEXO_q3rxdqxt.0o4
+Get-Command -mod tmpEXO_q3rxdqxt.0o4 | measure
+Get-Module -ListAvailable -Name Microsoft.Graph.Teams
