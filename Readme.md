@@ -2,6 +2,8 @@
 
 Files created or needed in Az-040 Course in CW47 2026
 
+Trainer: DI Thomas Schleich (office@dist.at)
+
 ---
 
 ## Important News
